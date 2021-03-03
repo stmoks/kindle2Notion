@@ -8,11 +8,14 @@ import os
 import unicodedata
 from settings import CLIPPINGS_FILE, NOTION_TOKEN, NOTION_TABLE_ID
 
-# create the Kindle Clippings class and the accompanying functions
+# create the Kindle Clippings class and the accompanying attribute/methods
 
 
 class KindleClippings(object):
-    # using a slightly more conventional definition of the self. variable
+    # seems conventional to define the class as KindleClippings(object) even though the var is only passed in the init method
+
+    # important to note the difference between class object attributes (are the same regardless of the instance) vs instance attributes that differ from instance to instance
+
     def __init__(self, clippingsFile):
         self.clippings = self.getAllClippings(clippingsFile)
 
@@ -30,16 +33,16 @@ class KindleClippings(object):
         for eachClipping in allClippings:
             eachClipping = eachClipping.strip().split("\n")
 
-            # Sometimes a null text or a bookmark can be selected as clipping. So check the array size;
+            # Sometimes a null text or a bookmark is selected in the clipping. In these cases, we need to check the length of the cell.
             if len(eachClipping) >= 3:
                 firstLine = eachClipping[0]
-                # Second line after = marks, for identifying type
+                # Second line after = marks, used to identify the type
                 secondLine = eachClipping[1]
 
                 print("Processing note/highlight number",
                       counter, "/", total, "from", firstLine)
 
-                # TODO: Author name can be stated like "Voltaire (francois Marie Arouet)" So author name should be extracted with Regex.
+                # TODO: Author name might be stated as follows: "Voltaire (francois Marie Arouet)". So author name should be extracted with Regex.
                 title_author = eachClipping[0].replace(
                     '(', '|').replace(')', '')
 
@@ -51,9 +54,9 @@ class KindleClippings(object):
                 # or 3 values: (page, location, date)
                 # We'll get last item for date.
                 # Parameter Explanation
-                # 1. pageOrAndLoc: page or and location: page or location & page and location can return
+                # 1. pageAndloc: page and location of the highlight
                 # 2. optLocAndDate: Optionally Location can return and date can return or only date can return as array
-                pageOrAndLoc, *optLocAndDate = secondLine.strip().split('|')
+                pageAndloc, *optLocAndDate = secondLine.strip().split('|')
 
                 addedOn = optLocAndDate[-1]
                 dateAdded = datetime.strptime(
@@ -69,19 +72,19 @@ class KindleClippings(object):
                     'Clipping': clipping
                 }
 
-                # TODO: This conditions also can be reduced. New logic can check "Your X at/on location/page" and change it dynamically
+                # TODO: These conditions can also be collapsed. New logic can check "Your X at/on location/page" and change it dynamically
                 if '- Your Highlight at location ' in secondLine:
-                    location = pageOrAndLoc.replace(
+                    location = pageAndloc.replace(
                         '- Your Highlight at location ', '').replace(' ', '')
                     lastClip["Location"] = location
 
                 elif '- Your Note on location ' in secondLine:
-                    location = pageOrAndLoc.replace(
+                    location = pageAndloc.replace(
                         '- Your Note on location ', '').replace(' ', '')
                     lastClip["Location"] = location
 
                 elif '- Your Highlight on page ' in secondLine and 'location ' in secondLine:
-                    page = pageOrAndLoc.replace(
+                    page = pageAndloc.replace(
                         '- Your Highlight on page ', '').replace(' ', '')
                     location = optLocAndDate[0].replace(
                         ' location ', '').replace(' ', '')
@@ -89,7 +92,7 @@ class KindleClippings(object):
                     lastClip["Location"] = location
 
                 elif '- Your Note on page ' in secondLine and 'location ' in secondLine:
-                    page = pageOrAndLoc.replace(
+                    page = pageAndloc.replace(
                         '- Your Note on page ', '').replace(' ', '')
                     location = optLocAndDate[0].replace(
                         ' location ', '').replace(' ', '')
@@ -97,12 +100,12 @@ class KindleClippings(object):
                     lastClip["Location"] = location
 
                 elif '- Your Highlight on page ' in secondLine and 'location ' not in secondLine:
-                    page = pageOrAndLoc.replace(
+                    page = pageAndloc.replace(
                         '- Your Highlight on page ', '').replace(' ', '')
                     lastClip["Page"] = page
 
                 elif '- Your Note on page ' in secondLine and 'location ' not in secondLine:
-                    page = pageOrAndLoc.replace(
+                    page = pageAndloc.replace(
                         '- Your Note on page ', '').replace(' ', '')
                     lastClip["Page"] = page
                     # TODO: Check this.
@@ -113,11 +116,10 @@ class KindleClippings(object):
                 counter += 1
 
             else:
-                # TODO: Bookmarks can be added to the service also ??
+                # TODO: Bookmarks can also be added to the service??
                 print("Skipping bookmark number:",
-                      counter, "Because it's empty.")
+                      counter, "because it's empty.")
                 counter += 1
-                continue
 
         return clipCollection
 
