@@ -3,10 +3,12 @@
 # https://realpython.com/nltk-nlp-python/
 
 
-# import nltk
-# nltk.download('stopwords')
-# nltk.download('averaged_perceptron_tagger')
 
+# nltk.download('stopwords') -- download stopwords
+# nltk.download('averaged_perceptron_tagger') - download parts of speech taggers
+# nltk.download('tagsets') - download part of speech tagger descriptions
+# nltk.download("maxent_ne_chunker") - download named entities list
+# nltk.download("words")
 
 # from main import KindleClippings
 import nltk
@@ -20,7 +22,8 @@ from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import PorterStemmer
 
-pos_dict = {'Noun':'NN','Verb':'VB','Pronoun':'NNP','Adjective':'JJ','Adverb':'VBP','Preposition':'VBG','Conjuction':'RB','Intejection':'NNS'}
+
+pos_dict = {'CC':'Conjuection','DT':'Determiner','IN':'Prepopsition','JJ':'Ordinal adjective','JJR':'Comparative adjective','JJS':'Superlative adjective','NN':'Singular/Mass common noun','NNP':'Singular proper noun','NNPS':'Plural proper noun','NNS':'Plural common noun','PRP':'Personal pronoun','PRP$':'Personal pronoun','RB':'Adverb','RBR':'Comaprative adverb','RBS':'Superlative adverb','RP':'Participle','UH':'Interjection','VB':'Verb','VBD':'Verb past tense','VBG':'Verb, present participle or gerund','VBP':'Present tense verb','VBZ':'Present tense verb'}
 
 
 # ch = KindleClippings(CLIPPINGS_FILE)
@@ -50,7 +53,11 @@ print(stemmed_words)
 
 # tagging the parts of speech to make more sense of the words
 tagged_words = nltk.pos_tag(filtered_list)
-print(tagged_words)
+
+# next, pull out named entities
+named_entities_list = 
+named_entities = [name for name in tagged_words if name in named_entities_list]
+
 
 
 
