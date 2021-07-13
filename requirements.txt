@@ -1,3 +1,4 @@
 ﻿DateTime==4.3
 notion==0.0.28
 python-decouple==3.3
+nltk == 3.5

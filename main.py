@@ -4,14 +4,14 @@ from notion.block import QuoteBlock, TextBlock, PageBlock
 
 from datetime import datetime
 import string
-import os
+#import ospy
 import unicodedata
 from settings import CLIPPINGS_FILE, NOTION_TOKEN, NOTION_TABLE_ID
 
 # create the Kindle Clippings class and the accompanying attribute/methods
 
 
-class KindleClippings(object):
+class KindleClippings():
     # seems conventional to define the class as KindleClippings(object) even though the var is only passed in the init method
 
     # important to note the difference between class object attributes (are the same regardless of the instance) vs instance attributes that differ from instance to instance
@@ -20,7 +20,8 @@ class KindleClippings(object):
         self.clippings = self.getAllClippings(clippingsFile)
 
     def getAllClippings(self, clippingsFile):
-        allClippings = open(clippingsFile, 'r', encoding="utf-8-sig").read()
+        with open(clippingsFile,'r',encoding = "utf-8-sig") as allClippings:
+            allClippings = allClippings.read()
         allClippings = unicodedata.normalize("NFKD", allClippings)
         return self.parseClippings(allClippings)
 
@@ -33,11 +34,14 @@ class KindleClippings(object):
         for eachClipping in allClippings:
             eachClipping = eachClipping.strip().split("\n")
 
-            # Sometimes a null text or a bookmark is selected in the clipping. In these cases, we need to check the length of the cell.
+            # We have now split the name of the book from the highlight and are will use these two seperately later
+            # Checking the length of the line is a data quality measure to avoid empty clippings
             if len(eachClipping) >= 3:
                 firstLine = eachClipping[0]
+
                 # Second line after = marks, used to identify the type
                 secondLine = eachClipping[1]
+
 
                 print("Processing note/highlight number",
                       counter, "/", total, "from", firstLine)
@@ -55,7 +59,7 @@ class KindleClippings(object):
                 # We'll get last item for date.
                 # Parameter Explanation
                 # 1. pageAndloc: page and location of the highlight
-                # 2. optLocAndDate: Optionally Location can return and date can return or only date can return as array
+                # 2. optLocAndDate: Can return date as an array
                 pageAndloc, *optLocAndDate = secondLine.strip().split('|')
 
                 addedOn = optLocAndDate[-1]
@@ -72,7 +76,7 @@ class KindleClippings(object):
                     'Clipping': clipping
                 }
 
-                # TODO: These conditions can also be collapsed. New logic can check "Your X at/on location/page" and change it dynamically
+                # TODO: These conditions can also be collapsed. New logic can check "Your note/highlight at location _ or your note/highlight on location _
                 if '- Your Highlight at location ' in secondLine:
                     location = pageAndloc.replace(
                         '- Your Highlight at location ', '').replace(' ', '')
@@ -109,7 +113,7 @@ class KindleClippings(object):
                         '- Your Note on page ', '').replace(' ', '')
                     lastClip["Page"] = page
                     # TODO: Check this.
-                    print(self.getClipping())
+                    # print(self.getClipping())
 
                 clipCollection.append(lastClip)
                 self.addToNotion(lastClip)
@@ -122,13 +126,15 @@ class KindleClippings(object):
                 counter += 1
 
         return clipCollection
+    # the return clipCollection is a dictionary that eventually goes back to the init method variable, self.clippings
 
+    # not sure what the below code is used for
     def getClipping(self):
         for i in self.clippings:
             yield i
 
-    def lenClippings(self):
-        return len(self.clippings)
+    # def lenClippings(self):
+    #     return len(self.clippings)
 
     def addNewClippingToRow(self, lastClip, row, titleExists):
         clipExists = False
@@ -227,3 +233,4 @@ allRows = cv.collection.get_rows()
 print(cv.parent.views)
 
 ch = KindleClippings(CLIPPINGS_FILE)
+# ch.getClipping()

@@ -4,3 +4,4 @@ help(notion).txt
 MyClippings.txt
 __pycache__/
 .Lib
+settings.py
