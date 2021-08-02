@@ -20,19 +20,19 @@ class KindleClippings():
         self.clippings = self.getAllClippings(clippingsFile)
 
     def getAllClippings(self, clippingsFile):
-        with open(clippingsFile,'r',encoding = "utf-8-sig") as allClippings:
+        with open(clippingsFile,'r',encoding = 'utf-8-sig') as allClippings:
             allClippings = allClippings.read()
-        allClippings = unicodedata.normalize("NFKD", allClippings)
+        allClippings = unicodedata.normalize('NFKD', allClippings)
         return self.parseClippings(allClippings)
 
     def parseClippings(self, allClippings):
-        allClippings = allClippings.split("==========")
+        allClippings = allClippings.split('==========')
         total = len(allClippings)
-        print("Found", total, "notes and highlights")
+        print('Found', total, 'notes and highlights')
         counter = 1
         clipCollection = []
         for eachClipping in allClippings:
-            eachClipping = eachClipping.strip().split("\n")
+            eachClipping = eachClipping.strip().split('\n')
 
             # We have now split the name of the book from the highlight and are will use these two seperately later
             # Checking the length of the line is a data quality measure to avoid empty clippings
@@ -43,10 +43,10 @@ class KindleClippings():
                 secondLine = eachClipping[1]
 
 
-                print("Processing note/highlight number",
-                      counter, "/", total, "from", firstLine)
+                print('Processing note/highlight number',
+                      counter, '/', total, 'from', firstLine)
 
-                # TODO: Author name might be stated as follows: "Voltaire (francois Marie Arouet)". So author name should be extracted with Regex.
+                # TODO: Author name might be stated as follows: 'Voltaire (francois Marie Arouet)'. So author name should be extracted with Regex.
                 title_author = eachClipping[0].replace(
                     '(', '|').replace(')', '')
 
@@ -69,49 +69,49 @@ class KindleClippings():
 
                 lastClip = {
                     'Title': title,
-                    'Author': ",".join(author),
+                    'Author': ','.join(author),
                     'Page': None,
                     'Location': None,
                     'Date Added': dateAdded,
                     'Clipping': clipping
                 }
 
-                # TODO: These conditions can also be collapsed. New logic can check "Your note/highlight at location _ or your note/highlight on location _
+                # TODO: These conditions can also be collapsed. New logic can check 'Your note/highlight at location _ or your note/highlight on location _
                 if '- Your Highlight at location ' in secondLine:
                     location = pageAndloc.replace(
                         '- Your Highlight at location ', '').replace(' ', '')
-                    lastClip["Location"] = location
+                    lastClip['Location'] = location
 
                 elif '- Your Note on location ' in secondLine:
                     location = pageAndloc.replace(
                         '- Your Note on location ', '').replace(' ', '')
-                    lastClip["Location"] = location
+                    lastClip['Location'] = location
 
                 elif '- Your Highlight on page ' in secondLine and 'location ' in secondLine:
                     page = pageAndloc.replace(
                         '- Your Highlight on page ', '').replace(' ', '')
                     location = optLocAndDate[0].replace(
                         ' location ', '').replace(' ', '')
-                    lastClip["Page"] = page
-                    lastClip["Location"] = location
+                    lastClip['Page'] = page
+                    lastClip['Location'] = location
 
                 elif '- Your Note on page ' in secondLine and 'location ' in secondLine:
                     page = pageAndloc.replace(
                         '- Your Note on page ', '').replace(' ', '')
                     location = optLocAndDate[0].replace(
                         ' location ', '').replace(' ', '')
-                    lastClip["Page"] = page
-                    lastClip["Location"] = location
+                    lastClip['Page'] = page
+                    lastClip['Location'] = location
 
                 elif '- Your Highlight on page ' in secondLine and 'location ' not in secondLine:
                     page = pageAndloc.replace(
                         '- Your Highlight on page ', '').replace(' ', '')
-                    lastClip["Page"] = page
+                    lastClip['Page'] = page
 
                 elif '- Your Note on page ' in secondLine and 'location ' not in secondLine:
                     page = pageAndloc.replace(
                         '- Your Note on page ', '').replace(' ', '')
-                    lastClip["Page"] = page
+                    lastClip['Page'] = page
                     # TODO: Check this.
                     # print(self.getClipping())
 
@@ -121,7 +121,7 @@ class KindleClippings():
 
             else:
                 # TODO: Bookmarks can also be added to the service??
-                print("Skipping bookmark number:",
+                print('Skipping bookmark number:',
                       counter, "because it's empty.")
                 counter += 1
 
@@ -152,20 +152,20 @@ class KindleClippings():
                 if lastClip['Page'] != None:
                     parentPage.children.add_new(
                         TextBlock,
-                        title="Page: " + lastClip['Page'] + "\tLocation: " + lastClip['Location'] + "\tDate Added: " + str(
-                            lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title='Page: ' + lastClip['Page'] + '\tLocation: ' + lastClip['Location'] + '\tDate Added: ' + str(
+                            lastClip['Date Added'].strftime('%A, %d %B %Y %I:%M:%S %p'))
                     )
                 else:
                     parentPage.children.add_new(
                         TextBlock,
-                        title="Location: " + lastClip['Location'] + "\tDate Added: " + str(
-                            lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title='Location: ' + lastClip['Location'] + '\tDate Added: ' + str(
+                            lastClip['Date Added'].strftime('%A, %d %B %Y %I:%M:%S %p'))
                     )
             else:
                 parentPage.children.add_new(
                     TextBlock,
-                    title="Page: " + lastClip['Page'] + "\tDate Added: " + str(
-                        lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                    title='Page: ' + lastClip['Page'] + '\tDate Added: ' + str(
+                        lastClip['Date Added'].strftime('%A, %d %B %Y %I:%M:%S %p'))
                 )
             parentPage.children.add_new(
                 QuoteBlock,
@@ -200,21 +200,21 @@ class KindleClippings():
                 if lastClip['Page'] != None:
                     parentPage.children.add_new(
                         TextBlock,
-                        title="Page: " + lastClip['Page'] + "\tLocation: " + lastClip['Location'] + "\tDate Added: " + str(
-                            lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title='Page: ' + lastClip['Page'] + '\tLocation: ' + lastClip['Location'] + '\tDate Added: ' + str(
+                            lastClip['Date Added'].strftime('%A, %d %B %Y %I:%M:%S %p'))
                     )
                 else:
                     parentPage.children.add_new(
                         TextBlock,
-                        title="Location: " + lastClip['Location'] + "\tDate Added: " + str(
-                            lastClip['Date Added'].strftime("%A, %d %B %Y %I:%M:%S %p"))
+                        title='Location: ' + lastClip['Location'] + '\tDate Added: ' + str(
+                            lastClip['Date Added'].strftime('%A, %d %B %Y %I:%M:%S %p'))
                     )
             else:
                 parentPage.children.add_new(
                     TextBlock,
-                    title="Page: " + "\tDate Added: " +
+                    title='Page: ' + '\tDate Added: ' +
                     str(lastClip['Date Added'].strftime(
-                        "%A, %d %B %Y %I:%M:%S %p"))
+                        '%A, %d %B %Y %I:%M:%S %p'))
                 )
             parentPage.children.add_new(
                 QuoteBlock,
